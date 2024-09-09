@@ -28,21 +28,21 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf(csrf -> csrf.disable())  // Desabilita CSRF para APIs stateless
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless
+        return http.csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Permite acesso sem autenticação para login, registro e verificação
+                        // Rotas públicas
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/user/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/user/verify").permitAll()
                         
-                        // Restrição para ADMIN: pode acessar rotas de deletar usuários
+                        // Restrição para ADMIN
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/admin/delete-user/**").hasRole("ADMIN")
                         
                         // USER e ADMIN podem acessar todas as outras rotas
-                        .anyRequest().authenticated()  // Isso deve vir por último
+                        .anyRequest().authenticated()
                 )
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)  // Adiciona o filtro JWT
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
